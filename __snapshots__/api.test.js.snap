@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Retrieve existing user 1`] = `
+Object {
+  "email": "jdoe@example.com",
+  "name": "Jane Doe",
+}
+`;
+
+exports[`Retrieve unknown user 1`] = `
+Object {
+  "title": "User unknown not found",
+}
+`;

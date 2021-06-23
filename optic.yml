@@ -1,0 +1,16 @@
+name: "Example API"
+tasks:
+  start:
+    command: "node api.js"
+    inboundUrl: http://localhost:4000
+  test:
+    command: "./node_modules/jest/bin/jest.js"
+    useTask: start
+  test-update-snapshots:
+    command: "./node_modules/jest/bin/jest.js --updateSnapshot"
+    useTask: start
+scripts:
+  checks:
+    command: "node api-checks.js"
+spectacleUrl:
+  command: echo $SPECTACLE_URL
