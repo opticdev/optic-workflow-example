@@ -10,6 +10,11 @@ test('Retrieve unknown user', async () => {
   expect(result).toMatchSnapshot();
 });
 
+test('Retrieve existing user', async () => {
+  const result = await fetch(api('/users2/jdoe')).then((res) => res.json());
+  expect(result).toMatchSnapshot();
+});
+
 function api(path) {
   return `${process.env.OPTIC_PROXY}${path}`;
 }
