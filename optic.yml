@@ -12,5 +12,3 @@ tasks:
 scripts:
   checks:
     command: "node api-checks.js"
-spectacleUrl:
-  command: echo $SPECTACLE_URL

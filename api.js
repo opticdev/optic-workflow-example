@@ -24,6 +24,21 @@ app.get('/users/:username', (req, res) => {
   res.json(user);
 });
 
+app.get('/users2/:username', (req, res) => {
+  const user = users[req.params.username];
+
+  if (!user) {
+    return res
+      .status(404)
+      .setHeader('Content-Type', 'application/problem+json')
+      .json({
+        title: `User ${req.params.username} not found`,
+      });
+  }
+
+  res.json(user);
+});
+
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
