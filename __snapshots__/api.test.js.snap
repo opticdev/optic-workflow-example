@@ -19,3 +19,9 @@ Object {
   "title": "User unknown not found",
 }
 `;
+
+exports[`Retrieve unknown user 2`] = `
+Object {
+  "title": "User unknown not found",
+}
+`;
