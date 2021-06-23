@@ -15,10 +15,10 @@ test('Retrieve existing user2', async () => {
   expect(result).toMatchSnapshot();
 });
 
-test('Retrieve unknown user2', async () => {
-  const result = await fetch(api('/users2/unknown')).then((res) => res.json());
-  expect(result).toMatchSnapshot();
-});
+// test('Retrieve unknown user2', async () => {
+//   const result = await fetch(api('/users2/unknown')).then((res) => res.json());
+//   expect(result).toMatchSnapshot();
+// });
 
 function api(path) {
   return `${process.env.OPTIC_PROXY}${path}`;
