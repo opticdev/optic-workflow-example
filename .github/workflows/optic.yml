@@ -1,11 +1,20 @@
-name: Run API Tests
+name: Optic Changelog
 
 on:
   pull_request:
     branches: [main]
 
 jobs:
-  build:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Optic Changelog
+      uses: opticdev/optic-changelog@main
+      with:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        OPTIC_API_KEY: ${{secrets.OPTIC_API_KEY}}
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -23,8 +32,10 @@ jobs:
     - name: Install Optic CLI
       run: npm install -g @useoptic/cli 
     - name: Install app dependencies
-      run: npm ci
+      run: npm ci && npm dedupe
     - name: Run API tests
       run: api run test --ci --exit-on-diff
+    - name: Check
+      run: npm ls graphql
     - name: Generate an OpenAPI file
       run: yarn generateOas && cat .optic/generated/openapi.yaml
