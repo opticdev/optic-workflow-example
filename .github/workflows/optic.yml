@@ -35,5 +35,3 @@ jobs:
       run: npm ci && npm dedupe
     - name: Run API tests
       run: api run test --exit-on-diff
-    - name: Generate an OpenAPI file
-      run: npm run generateOas && cat .optic/generated/openapi.yaml
