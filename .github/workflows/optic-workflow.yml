@@ -1,4 +1,4 @@
-name: Optic Changelog
+name: Optic Workflow
 
 on:
   pull_request:
@@ -32,7 +32,7 @@ jobs:
     - name: Install Optic CLI
       run: npm install --global --legacy-peer-deps @useoptic/cli
     - name: Install app dependencies
-      run: npm ci && npm dedupe
+      run: npm ci
     - name: Run API tests
       run: api run test --ci --exit-on-diff
   share:
