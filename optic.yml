@@ -4,6 +4,9 @@ tasks:
     command: "node api.js"
     inboundUrl: http://localhost:4000
   test:
+    command: echo "testing now"
+    useTask: start
+  test-old:
     command: "./node_modules/jest/bin/jest.js"
     useTask: start
   test-update-snapshots:
