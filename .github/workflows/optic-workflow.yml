@@ -30,7 +30,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
     - name: Install Optic CLI
-      run: npm install --global --legacy-peer-deps @useoptic/cli
+      uses: smizell/optic-action-test/cli@main
     - name: Install app dependencies
       run: npm ci
     - name: Run API tests
