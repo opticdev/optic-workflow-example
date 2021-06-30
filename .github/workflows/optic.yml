@@ -33,9 +33,9 @@ jobs:
       run: npm install -g @useoptic/cli 
     - name: Install app dependencies
       run: npm ci && npm dedupe
-    - name: Run API tests
-      run: api run test --ci --exit-on-diff
     - name: Check
       run: npm ls graphql
+    - name: Run API tests
+      run: api run test --ci --exit-on-diff
     - name: Generate an OpenAPI file
       run: yarn generateOas && cat .optic/generated/openapi.yaml
