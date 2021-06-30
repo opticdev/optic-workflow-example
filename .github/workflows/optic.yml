@@ -30,8 +30,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
     - name: Install Optic CLI
-      run: npm install -g @useoptic/cli 
+      run: npm install --global --legacy-peer-deps @useoptic/cli
     - name: Install app dependencies
       run: npm ci && npm dedupe
     - name: Run API tests
-      run: api run test --exit-on-diff
+      run: api run test --ci --exit-on-diff
