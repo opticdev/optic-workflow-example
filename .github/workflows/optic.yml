@@ -34,6 +34,6 @@ jobs:
     - name: Install app dependencies
       run: npm ci && npm dedupe
     - name: Run API tests
-      run: api run test --ci --exit-on-diff
+      run: api run test --exit-on-diff
     - name: Generate an OpenAPI file
-      run: yarn generateOas && cat .optic/generated/openapi.yaml
+      run: npm run generateOas && cat .optic/generated/openapi.yaml
