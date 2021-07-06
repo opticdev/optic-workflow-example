@@ -1,4 +1,4 @@
-name: Optic Share
+name: OpenAPI
 
 on:
   pull_request:
@@ -24,6 +24,6 @@ jobs:
       run: npm install --global --legacy-peer-deps @useoptic/cli
     - name: Generate OpenAPI
       run: api generate:oas --baseDocument=./base-openapi.yml
-    - name: Share OpenAPI
-      # At this point, we could push the OpenAPI file somewhere
-      run: cat .optic/generated/openapi.yaml
+    - uses: stoplightio/spectral-action@v0.7.3
+      with:
+        file_glob: '.optic/generated/openapi.yaml'
