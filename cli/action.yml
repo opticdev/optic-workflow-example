@@ -1,0 +1,7 @@
+name: 'Install Optic CLI'
+description: 'Install the Optic CLI'
+runs:
+  using: "composite"
+  steps:
+    - run: npm install --global --legacy-peer-deps @useoptic/cli
+      shell: bash
