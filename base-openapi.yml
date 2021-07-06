@@ -1,3 +1,17 @@
 info:
   title: User API
   version: 0.1.0
+  description: API for managing users
+  contact:
+    name: Jane Doe
+    email: jdoe@example.com
+tags:
+  - name: User
+servers:
+  - url: https://api.example.com
+    description: Production server
+paths:
+  /users/{username}:
+    get:
+      operationId: retreiveUser
+      tags: [User]
