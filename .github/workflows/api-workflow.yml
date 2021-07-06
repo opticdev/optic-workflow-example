@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Install app dependencies
+      run: npm ci
     - name: Optic Changelog
       uses: opticdev/optic-changelog@main
       with:
