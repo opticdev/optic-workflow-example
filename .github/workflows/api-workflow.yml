@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  changelog:
+  optic:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -14,6 +14,10 @@ jobs:
       with:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         OPTIC_API_KEY: ${{secrets.OPTIC_API_KEY}}
+    - name: Optic API Checks
+      run: node checks.js
+      env:
+        SPECTACLE_URL: http://localhost:34444/api/specs/1/spectacle
   test:
     runs-on: ubuntu-latest
     steps:
