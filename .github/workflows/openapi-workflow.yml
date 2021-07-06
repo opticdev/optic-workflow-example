@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  share:
+  openapi:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
