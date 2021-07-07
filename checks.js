@@ -23,9 +23,9 @@ function isMethod(endpoint, method) {
 }
 
 function hasStatusCode(endpoint, givenStatusCode) {
-  return endpoint.responses.find(({ statusCode }) => {
+  return Boolean(endpoint.responses.find(({ statusCode }) => {
     return statusCode === givenStatusCode;
-  });
+  }));
 }
 
 function requireStatusCode(endpoint, statusCode) {
