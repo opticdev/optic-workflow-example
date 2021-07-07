@@ -8,7 +8,7 @@ main();
 
 async function main() {
   const baseSpec = JSON.parse(fs.readFileSync(process.env.BASE_SPEC_PATH));
-  const spectacle = Spectacle.forEvents(baseSpec);
+  const spectacle = await Spectacle.forEvents(baseSpec);
   const batchCommitResults = await spectacle.getBatchCommits();
   const sinceBatchCommitId = batchCommitResults.data?.batchCommits?.reduce(
     (result, batchCommit) => {
