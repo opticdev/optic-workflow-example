@@ -19,7 +19,7 @@ jobs:
         ref: main
         path: main-branch
     - name: Get base Optic spec
-      run: echo "::set-output name=base-spec::$(cat ./main-branch/.optic/api/specification.json)"
+      run: echo "::set-output name=base-spec::$(cat ../main-branch/.optic/api/specification.json)"
       id: get-base-spec
     - name: Use Node.js
       uses: actions/setup-node@v2
