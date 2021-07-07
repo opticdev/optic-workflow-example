@@ -1,12 +1,16 @@
-const { EndpointChangeChecks, displayResults } = require('./lib/endpoint-checks');
+const { EndpointChangeChecks, displayResults } = require('./endpoint-checks');
+
+const SPEC_PATH = process.env.SPEC_PATH || '.optic/api/specification.json'
 
 main();
 
 async function main() {
-  const endpointChanges = new EndpointChangeChecks({
-    sinceBatchCommitId: process.env.SINCE_BATCH_COMMIT_ID,
-    spectacleUrl: process.env.SPECTACLE_URL
-  });
+  const endpointChanges = await EndpointChangeChecks.withSpectacle(
+    SPEC_PATH,
+    {
+      sinceBatchCommitId: process.env.SINCE_BATCH_COMMIT_ID,
+    }
+  );
   endpointChanges.on('added', requireNotFoundWithGet);
   const results = await endpointChanges.run();
   displayResults(results);
@@ -19,13 +23,15 @@ async function requireNotFoundWithGet({ endpoint }) {
 }
 
 function isMethod(endpoint, method) {
-  return endpoint.method === method
+  return endpoint.method === method;
 }
 
 function hasStatusCode(endpoint, givenStatusCode) {
-  return Boolean(endpoint.responses.find(({ statusCode }) => {
-    return statusCode === givenStatusCode;
-  }));
+  return Boolean(
+    endpoint.responses.find(({ statusCode }) => {
+      return statusCode === givenStatusCode;
+    })
+  );
 }
 
 function requireStatusCode(endpoint, statusCode) {

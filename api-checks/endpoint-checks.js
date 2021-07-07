@@ -1,14 +1,20 @@
-const fetch = require('node-fetch');
+const path = require('path');
+const { Spectacle } = require('./spectacle');
 
 class EndpointChangeChecks {
-  constructor({ sinceBatchCommitId, spectacleUrl }) {
+  constructor({ sinceBatchCommitId, spectacle }) {
     this.sinceBatchCommitId = sinceBatchCommitId;
-    this.spectacle = new Spectacle(spectacleUrl);
+    this.spectacle = spectacle;
     this.checks = {
       added: [],
       updated: [],
       removed: [],
     };
+  }
+
+  static async withSpectacle(specFilename, options) {
+    const spectacle = await Spectacle.forFile(path.join('..', specFilename));
+    return new EndpointChangeChecks({ ...options, spectacle });
   }
 
   on(action, check) {
@@ -23,7 +29,9 @@ class EndpointChangeChecks {
     const checkResults = new CheckResults();
     for (const endpointChange of endpointChangesQuery.data.endpointChanges
       .endpoints) {
-      const matchingRequest = await this.spectacle.getMatchingRequest(endpointChange);
+      const matchingRequest = await this.spectacle.getMatchingRequest(
+        endpointChange
+      );
       for (const check of this.checks[endpointChange.change.category]) {
         const checkResult = await check({
           endpointChange,
@@ -36,6 +44,37 @@ class EndpointChangeChecks {
     return checkResults;
   }
 }
+
+// async function getLatestBatchCommit(events) {
+//   if (events.length < 1) {
+//     return null;
+//   }
+
+//   // Mostly copied from `opticdev/optic/workspaces/changelog/src/index.ts
+//   const initialOpticContext = await InMemoryOpticContextBuilder.fromEvents(
+//     OpticEngine,
+//     events
+//   );
+//   const initialSpectacle = await makeSpectacle(initialOpticContext);
+
+//   const batchCommitResults = await initialSpectacle.queryWrapper({
+//     query: `{
+//       batchCommits {
+//         createdAt
+//         batchId
+//       }
+//     }`,
+//     variables: {},
+//   });
+
+//   const latestBatchCommit = batchCommitResults.data?.batchCommits?.reduce(
+//     (result, batchCommit) => {
+//       return batchCommit.createdAt > result.createdAt ? batchCommit : result;
+//     }
+//   );
+
+//   return latestBatchCommit.batchId;
+// }
 
 class CheckResults {
   constructor() {
@@ -52,61 +91,6 @@ class CheckResults {
 
   hasFailures() {
     return Boolean(this.results.length);
-  }
-}
-
-class Spectacle {
-  constructor(spectacleUrl) {
-    this.spectacleUrl = spectacleUrl;
-  }
-
-  async getEndpointChanges(sinceBatchCommitId) {
-    return await this.query({
-      query: `query GetEndpointChanges($sinceBatchCommitId: String!) {
-        endpointChanges(sinceBatchCommitId: $sinceBatchCommitId) {
-          endpoints {
-            change {
-              category
-            }
-            pathId
-            path
-            method
-          }
-        }
-      }`,
-      variables: { sinceBatchCommitId },
-    });
-  }
-
-  async getMatchingRequest(endpointChange) {
-    return (
-      await this.query({
-        query: `{
-        requests {
-          absolutePathPatternWithParameterNames
-          method
-          pathId
-          responses {
-            id
-            statusCode
-          }
-        }
-      }`,
-        variables: {},
-      })
-    ).data.requests.find(
-      (request) =>
-        request.pathId === endpointChange.pathId && request.method === endpointChange.method
-    );
-  }
-
-  async query(body) {
-    const result = await fetch(this.spectacleUrl, {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    return await result.json();
   }
 }
 
