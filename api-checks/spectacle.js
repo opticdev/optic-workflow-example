@@ -78,4 +78,15 @@ class Spectacle {
   }
 }
 
-module.exports = { Spectacle };
+async function getSinceBatchCommitId(specFilename) {
+  const baseSpec = JSON.parse(fs.readFileSync(specFilename));
+  const spectacle = await Spectacle.forEvents(baseSpec);
+  const batchCommitResults = await spectacle.getBatchCommits();
+  return batchCommitResults.data?.batchCommits?.reduce(
+    (result, batchCommit) => {
+      return batchCommit.createdAt > result.createdAt ? batchCommit : result;
+    }
+  ).batchId;
+}
+
+module.exports = { Spectacle, getSinceBatchCommitId };

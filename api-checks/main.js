@@ -1,13 +1,16 @@
 const fs = require('fs');
 const { EndpointChangeChecks, displayResults } = require('./endpoint-checks');
-const { Spectacle } = require('./spectacle');
+const { getSinceBatchCommitId } = require('./spectacle');
 
+// This allows for changing the current spec path
 const SPEC_PATH = process.env.SPEC_PATH || '.optic/api/specification.json';
 
 main();
 
 async function main() {
-  const sinceBatchCommitId = await getSinceBatchCommitId();
+  const sinceBatchCommitId = await getSinceBatchCommitId(
+    process.env.BASE_SPEC_PATH
+  );
   const endpointChanges = await EndpointChangeChecks.withSpectacle(SPEC_PATH, {
     sinceBatchCommitId,
   });
@@ -15,17 +18,6 @@ async function main() {
   const results = await endpointChanges.run();
   displayResults(results);
   if (results.hasFailures()) process.exit(1);
-}
-
-async function getSinceBatchCommitId() {
-  const baseSpec = JSON.parse(fs.readFileSync(process.env.BASE_SPEC_PATH));
-  const spectacle = await Spectacle.forEvents(baseSpec);
-  const batchCommitResults = await spectacle.getBatchCommits();
-  return batchCommitResults.data?.batchCommits?.reduce(
-    (result, batchCommit) => {
-      return batchCommit.createdAt > result.createdAt ? batchCommit : result;
-    }
-  ).batchId;
 }
 
 async function requireNotFoundWithGet({ endpoint }) {
