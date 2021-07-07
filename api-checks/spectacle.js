@@ -64,6 +64,18 @@ class Spectacle {
         request.method === endpointChange.method
     );
   }
+
+  async getBatchCommits() {
+    return await this.spectacle.queryWrapper({
+      query: `{
+        batchCommits {
+          createdAt
+          batchId
+        }
+      }`,
+      variables: {},
+    });
+  }
 }
 
 module.exports = { Spectacle };

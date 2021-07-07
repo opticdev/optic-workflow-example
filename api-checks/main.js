@@ -1,17 +1,24 @@
+const fs = require('fs');
 const { EndpointChangeChecks, displayResults } = require('./endpoint-checks');
+const { Spectacle } = require('./spectacle');
 
-const SPEC_PATH = process.env.SPEC_PATH || '.optic/api/specification.json'
+const SPEC_PATH = process.env.SPEC_PATH || '.optic/api/specification.json';
 
 main();
 
 async function main() {
-  console.log('Base spec', process.env.BASE_SPEC)
-  const endpointChanges = await EndpointChangeChecks.withSpectacle(
-    SPEC_PATH,
-    {
-      sinceBatchCommitId: process.env.SINCE_BATCH_COMMIT_ID,
+  const baseSpec = JSON.parse(fs.readFileSync(process.env.BASE_SPEC_PATH));
+  const spectacle = Spectacle.forEvents(baseSpec);
+  const batchCommitResults = await spectacle.getBatchCommits();
+  const sinceBatchCommitId = batchCommitResults.data?.batchCommits?.reduce(
+    (result, batchCommit) => {
+      return batchCommit.createdAt > result.createdAt ? batchCommit : result;
     }
-  );
+  ).batchId;
+  console.log('Since batch commit ID', sinceBatchCommitId);
+  const endpointChanges = await EndpointChangeChecks.withSpectacle(SPEC_PATH, {
+    sinceBatchCommitId,
+  });
   endpointChanges.on('added', requireNotFoundWithGet);
   const results = await endpointChanges.run();
   displayResults(results);
