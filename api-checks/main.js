@@ -7,15 +7,7 @@ const SPEC_PATH = process.env.SPEC_PATH || '.optic/api/specification.json';
 main();
 
 async function main() {
-  const baseSpec = JSON.parse(fs.readFileSync(process.env.BASE_SPEC_PATH));
-  const spectacle = await Spectacle.forEvents(baseSpec);
-  const batchCommitResults = await spectacle.getBatchCommits();
-  const sinceBatchCommitId = batchCommitResults.data?.batchCommits?.reduce(
-    (result, batchCommit) => {
-      return batchCommit.createdAt > result.createdAt ? batchCommit : result;
-    }
-  ).batchId;
-  console.log('Since batch commit ID', sinceBatchCommitId);
+  const sinceBatchCommitId = await getSinceBatchCommitId();
   const endpointChanges = await EndpointChangeChecks.withSpectacle(SPEC_PATH, {
     sinceBatchCommitId,
   });
@@ -23,6 +15,17 @@ async function main() {
   const results = await endpointChanges.run();
   displayResults(results);
   if (results.hasFailures()) process.exit(1);
+}
+
+async function getSinceBatchCommitId() {
+  const baseSpec = JSON.parse(fs.readFileSync(process.env.BASE_SPEC_PATH));
+  const spectacle = await Spectacle.forEvents(baseSpec);
+  const batchCommitResults = await spectacle.getBatchCommits();
+  return batchCommitResults.data?.batchCommits?.reduce(
+    (result, batchCommit) => {
+      return batchCommit.createdAt > result.createdAt ? batchCommit : result;
+    }
+  ).batchId;
 }
 
 async function requireNotFoundWithGet({ endpoint }) {
