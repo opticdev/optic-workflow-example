@@ -11,8 +11,16 @@ jobs:
         working-directory: api-checks
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - run: cat $(echo $GITHUB_EVENT_PATH)
+    - name: Checkout HEAD
+      uses: actions/checkout@v2
+    - name: Checkout BASE
+      uses: actions/checkout@v2
+      with:
+        ref: main
+        path: main-branch
+    - name: Get base Optic spec
+      run: echo "::set-output name=base-spec::$(cat ./main-branch/.optic/api/specification.json)"
+      id: get-base-spec
     - name: Use Node.js
       uses: actions/setup-node@v2
       with:
@@ -31,6 +39,7 @@ jobs:
       env:
         # GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         SINCE_BATCH_COMMIT_ID: a2210088-b48c-44aa-853d-fece5e924482
+        BASE_SPEC: ${{steps.get-base-spec.base-spec}}
   # optic:
   #   runs-on: ubuntu-latest
   #   steps:
@@ -54,13 +63,6 @@ jobs:
   #     with:
   #       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   #       OPTIC_API_KEY: ${{secrets.OPTIC_API_KEY}}
-  #   - name: Install Optic CLI
-  #     uses: ./cli
-  #   - run: api status
-  #   - name: Optic API Checks
-  #     run: node checks.js
-  #     env:
-  #       SPECTACLE_URL: http://localhost:34444/api/specs/1/spectacle
   # test:
   #   runs-on: ubuntu-latest
   #   steps:

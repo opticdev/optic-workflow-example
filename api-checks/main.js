@@ -5,6 +5,7 @@ const SPEC_PATH = process.env.SPEC_PATH || '.optic/api/specification.json'
 main();
 
 async function main() {
+  console.log('Base spec', process.env.BASE_SPEC)
   const endpointChanges = await EndpointChangeChecks.withSpectacle(
     SPEC_PATH,
     {
