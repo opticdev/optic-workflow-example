@@ -5,10 +5,19 @@ on:
     branches: [main]
 
 jobs:
-  optic:
+  api-checks:
+    defaults:
+      run:
+        working-directory: api-checks
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout HEAD
+      uses: actions/checkout@v2
+    - name: Checkout BASE
+      uses: actions/checkout@v2
+      with:
+        ref: main
+        path: main-branch
     - name: Use Node.js
       uses: actions/setup-node@v2
       with:
@@ -22,18 +31,32 @@ jobs:
           ${{ runner.os }}-node-
     - name: Install app dependencies
       run: npm ci
+    - name: Run API checks
+      run: node main.js
+      env:
+        # We have to use ../main-branch because of the working-directory
+        BASE_SPEC_PATH: ../main-branch/.optic/api/specification.json
+  optic:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: cat $(echo $GITHUB_EVENT_PATH)
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 15
+    - name: Cache npm dependencies
+      uses: actions/cache@v2
+      with:
+        path: '~/.npm'
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
     - name: Optic Changelog
       uses: opticdev/optic-changelog@main
       with:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         OPTIC_API_KEY: ${{secrets.OPTIC_API_KEY}}
-    - name: Install Optic CLI
-      uses: ./cli
-    - run: api status
-    - name: Optic API Checks
-      run: node checks.js
-      env:
-        SPECTACLE_URL: http://localhost:34444/api/specs/1/spectacle
   test:
     runs-on: ubuntu-latest
     steps:
@@ -74,6 +97,7 @@ jobs:
       run: npm install --global --legacy-peer-deps @useoptic/cli
     - name: Generate OpenAPI
       run: api generate:oas --baseDocument=./base-openapi.yml
-    - uses: stoplightio/spectral-action@v0.7.3
+    - name: Run Spectral
+      uses: stoplightio/spectral-action@v0.7.3
       with:
         file_glob: '.optic/generated/openapi.yaml'

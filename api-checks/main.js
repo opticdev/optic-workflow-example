@@ -1,11 +1,18 @@
-const { EndpointChangeChecks, displayResults } = require('./lib/endpoint-checks');
+const fs = require('fs');
+const { EndpointChangeChecks, displayResults } = require('./endpoint-checks');
+const { getSinceBatchCommitId } = require('./spectacle');
+
+// This allows for changing the current spec path
+const SPEC_PATH = process.env.SPEC_PATH || '.optic/api/specification.json';
 
 main();
 
 async function main() {
-  const endpointChanges = new EndpointChangeChecks({
-    sinceBatchCommitId: process.env.SINCE_BATCH_COMMIT_ID,
-    spectacleUrl: process.env.SPECTACLE_URL
+  const sinceBatchCommitId = await getSinceBatchCommitId(
+    process.env.BASE_SPEC_PATH
+  );
+  const endpointChanges = await EndpointChangeChecks.withSpectacle(SPEC_PATH, {
+    sinceBatchCommitId,
   });
   endpointChanges.on('added', requireNotFoundWithGet);
   const results = await endpointChanges.run();
@@ -19,13 +26,15 @@ async function requireNotFoundWithGet({ endpoint }) {
 }
 
 function isMethod(endpoint, method) {
-  return endpoint.method === method
+  return endpoint.method === method;
 }
 
 function hasStatusCode(endpoint, givenStatusCode) {
-  return endpoint.responses.find(({ statusCode }) => {
-    return statusCode === givenStatusCode;
-  });
+  return Boolean(
+    endpoint.responses.find(({ statusCode }) => {
+      return statusCode === givenStatusCode;
+    })
+  );
 }
 
 function requireStatusCode(endpoint, statusCode) {
